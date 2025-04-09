@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบจำลองตรีโกณมิติ (Trigonometric Functions Visualizer)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px; /* ขอบมน */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column; /* Changed to column for better mobile view */
+            align-items: center; /* Center align items */
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e9ecef; /* สีพื้นหลังช่องควบคุม */
+            border-radius: 10px; /* ขอบมน */
+        }
+        .controls label {
+            margin-bottom: 10px; /* Add space below label */
+            font-weight: bold;
+            color: #495057; /* สีข้อความ */
+        }
+        .controls input[type="range"] {
+            width: 80%; /* Adjust width */
+            max-width: 400px;
+            cursor: pointer;
+            margin-bottom: 10px; /* Add space below slider */
+        }
+        .controls span {
+            min-width: 80px; /* Give space for value */
+            text-align: center;
+            font-weight: bold;
+            color: #007bff; /* สีค่าตัวเลข */
+            background-color: #ffffff; /* พื้นหลังค่าตัวเลข */
+            padding: 5px 10px;
+            border-radius: 5px; /* ขอบมน */
+        }
+        .chart-container {
+            position: relative;
+            height: 450px; /* กำหนดความสูงคงที่ */
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 10px; /* ขอบมน */
+            padding: 10px;
+            box-sizing: border-box; /* Include padding in width/height */
+        }
+        canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0; /* พื้นหลังส่วนคำอธิบาย */
+            border-radius: 10px; /* ขอบมน */
+            line-height: 1.6;
+        }
+        .explanation h3 {
+            margin-top: 0;
+            color: #333;
+        }
+         /* Style for values display */
+         #value-display {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9em;
+         }
+         #value-display p {
+             margin: 5px 0;
+             color: #333;
+         }
+         #value-display span {
+             font-weight: bold;
+             margin-left: 5px;
+             padding: 2px 5px;
+             border-radius: 4px;
+         }
+         .sin-val { color: #e63946; background-color: #fdd; }
+         .cos-val { color: #1d3557; background-color: #dde; }
+         .tan-val { color: #2a9d8f; background-color: #dfd; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>แบบจำลองฟังก์ชันตรีโกณมิติ (Trigonometric Function Visualizer)</h2>
+
+        <div class="controls">
+            <label for="angleSlider">ปรับค่ามุม θ (Angle θ):</label>
+            <input type="range" id="angleSlider" min="-6.28" max="6.28" step="0.01" value="0">
+            <span>θ = <span id="angleValue">0.00</span> rad</span>
+             <div id="value-display">
+                <p>sin(<span id="displayAngleSin">0.00</span>) = <span id="sinValue" class="sin-val">0.00</span></p>
+                <p>cos(<span id="displayAngleCos">0.00</span>) = <span id="cosValue" class="cos-val">1.00</span></p>
+                <p>tan(<span id="displayAngleTan">0.00</span>) = <span id="tanValue" class="tan-val">0.00</span></p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="trigChart"></canvas>
+        </div>
+    </div>
+
+    <div class="container explanation">
+        <h3>คำอธิบาย (Explanation)</h3>
+        <p><strong>ตัวแปร (Variables):</strong></p>
+        <ul>
+            <li><strong>θ (theta):</strong> คือ ค่ามุมในหน่วยเรเดียน (Radians) ใช้เป็นอินพุตสำหรับฟังก์ชันตรีโกณมิติ</li>
+            <li><strong>sin(θ), cos(θ), tan(θ):</strong> คือ ค่าของฟังก์ชันไซน์ (Sine), โคไซน์ (Cosine), และแทนเจนต์ (Tangent) ที่มุม θ</li>
+        </ul>
+        <p><strong>สูตร (Formulas):</strong></p>
+        <ul>
+            <li>แสดงความสัมพันธ์ระหว่างมุม θ กับค่าของฟังก์ชัน sin, cos, tan บนวงกลมหนึ่งหน่วย หรือจากการคำนวณ</li>
+            <li>sin(θ) = y/r (ค่าแกน Y บนวงกลมหนึ่งหน่วย)</li>
+            <li>cos(θ) = x/r (ค่าแกน X บนวงกลมหนึ่งหน่วย)</li>
+            <li>tan(θ) = sin(θ) / cos(θ) = y/x</li>
+        </ul>
+        <p><strong>วิธีใช้งาน (How to Use):</strong></p>
+        <ol>
+            <li>เลื่อนแถบ "ปรับค่ามุม θ" เพื่อเปลี่ยนค่ามุม</li>
+            <li>สังเกตกราฟ:
+                <ul>
+                    <li>เส้นสีแดงคือ กราฟ sin(θ)</li>
+                    <li>เส้นสีน้ำเงินคือ กราฟ cos(θ)</li>
+                    <li>เส้นสีเขียวคือ กราฟ tan(θ)</li>
+                    <li>เส้นประแนวตั้งสีเทาแสดงตำแหน่งมุม θ ปัจจุบัน</li>
+                    <li>จุดทึบบนกราฟแต่ละเส้นแสดงค่า sin(θ), cos(θ), tan(θ) ณ มุมนั้น</li>
+                </ul>
+            </li>
+            <li>ค่ามุมปัจจุบัน (θ) และค่า sin, cos, tan จะแสดงอยู่ใต้แถบเลื่อน</li>
+            <li>เลื่อนเมาส์ไปเหนือเส้นกราฟเพื่อดูค่า ณ จุดต่างๆ (Tooltip)</li>
+        </ol>
+         <p><strong>หมายเหตุ:</strong> กราฟ tan(θ) จะมีเส้นขาดช่วงเนื่องจากค่าจะเข้าใกล้อนันต์ (Infinity) ที่มุม θ = π/2 + nπ (เช่น ±π/2, ±3π/2)</p>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('trigChart').getContext('2d');
+        const angleSlider = document.getElementById('angleSlider');
+        const angleValueSpan = document.getElementById('angleValue');
+        const sinValueSpan = document.getElementById('sinValue');
+        const cosValueSpan = document.getElementById('cosValue');
+        const tanValueSpan = document.getElementById('tanValue');
+        const displayAngleSin = document.getElementById('displayAngleSin');
+        const displayAngleCos = document.getElementById('displayAngleCos');
+        const displayAngleTan = document.getElementById('displayAngleTan');
+
+        const step = 0.1;
+        const xValues = [];
+        const sinValues = [];
+        const cosValues = [];
+        const tanValues = [];
+
+        // Generate data points for the curves
+        // Add nulls for tan near asymptotes to create breaks
+        for (let x = -2 * Math.PI; x <= 2 * Math.PI; x += step) {
+            xValues.push(x);
+            sinValues.push(Math.sin(x));
+            cosValues.push(Math.cos(x));
+
+            // Check for asymptotes for tan (near odd multiples of PI/2)
+            const cosVal = Math.cos(x);
+            if (Math.abs(cosVal) < 0.05) { // Threshold to detect near asymptote
+                tanValues.push(null); // Insert break
+            } else {
+                let tanVal = Math.tan(x);
+                // Clamp extreme values for better visualization
+                if (tanVal > 10) tanVal = 10;
+                if (tanVal < -10) tanVal = -10;
+                tanValues.push(tanVal);
+            }
+        }
+
+        // Function to create marker data
+        const createMarkerData = (angle) => {
+            const sinMarker = { x: angle, y: Math.sin(angle) };
+            const cosMarker = { x: angle, y: Math.cos(angle) };
+
+            const cosVal = Math.cos(angle);
+            let tanMarker = null;
+             if (Math.abs(cosVal) >= 0.01) { // Avoid plotting tan exactly at asymptote
+                let tanY = Math.tan(angle);
+                // Clamp values for the marker point as well
+                if (tanY > 10) tanY = 10;
+                if (tanY < -10) tanY = -10;
+                 tanMarker = { x: angle, y: tanY };
+             }
+
+            return { sinMarker, cosMarker, tanMarker };
+        };
+
+        // Initial marker data
+        let currentAngle = parseFloat(angleSlider.value);
+        let markers = createMarkerData(currentAngle);
+
+        const trigChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: xValues, // X-axis labels (angles)
+                datasets: [
+                    {
+                        label: 'sin (Sine)', // ตำนานกราฟ
+                        data: sinValues,
+                        borderColor: '#e63946', // Red
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0, // Hide points by default
+                        pointHitRadius: 5, // Area for hover detection
+                        tension: 0.1
+                    },
+                    {
+                        label: 'cos (Cosine)', // ตำนานกราฟ
+                        data: cosValues,
+                        borderColor: '#1d3557', // Blue
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHitRadius: 5,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'tan (Tangent)', // ตำนานกราฟ
+                        data: tanValues,
+                        borderColor: '#2a9d8f', // Green
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHitRadius: 5,
+                        tension: 0.1,
+                        spanGaps: false // Do not connect points across nulls
+                    },
+                     // Dataset for the vertical line marker
+                    {
+                        label: 'มุม (Angle θ)',
+                        data: [{x: currentAngle, y: -10}, {x: currentAngle, y: 10}], // Line spans y-axis
+                        borderColor: '#adb5bd', // Gray
+                        borderWidth: 2,
+                        borderDash: [5, 5], // Make it dashed
+                        fill: false,
+                        pointRadius: 0, // No points on the line itself
+                        order: 1 // Draw it before markers
+                    },
+                    // Datasets for the value markers (drawn on top)
+                    {
+                        label: 'sin(θ) value',
+                        data: [markers.sinMarker],
+                        borderColor: '#e63946',
+                        backgroundColor: '#e63946', // Red marker
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: false,
+                        showLine: false, // Only show point
+                        order: 2 // Draw markers last
+                    },
+                    {
+                        label: 'cos(θ) value',
+                        data: [markers.cosMarker],
+                        borderColor: '#1d3557',
+                        backgroundColor: '#1d3557', // Blue marker
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: false,
+                        showLine: false,
+                        order: 2
+                    },
+                     {
+                         label: 'tan(θ) value',
+                         data: markers.tanMarker ? [markers.tanMarker] : [], // Only add if not null
+                         borderColor: '#2a9d8f',
+                         backgroundColor: '#2a9d8f', // Green marker
+                         pointRadius: 5,
+                         pointHoverRadius: 7,
+                         fill: false,
+                         showLine: false,
+                         order: 2
+                     }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Prevent auto aspect ratio, rely on container size
+                animation: {
+                    duration: 0 // Disable initial animation
+                },
+                hover: {
+                    mode: 'index', // Show tooltip for all datasets at that x-index
+                    intersect: false
+                },
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            // Format tooltip title (x-axis value)
+                             title: function(tooltipItems) {
+                                 if (tooltipItems.length > 0) {
+                                     const xValue = tooltipItems[0].parsed.x;
+                                     return `θ = ${xValue.toFixed(2)} rad`;
+                                 }
+                                 return '';
+                             },
+                             // Format tooltip labels (y-axis values)
+                             label: function(context) {
+                                 let label = context.dataset.label || '';
+                                 if (label) {
+                                     // Exclude marker labels from tooltip body
+                                     if (label.includes('(θ) value') || label.includes('มุม (Angle θ)')) {
+                                         return null; // Hide these datasets in tooltip body
+                                     }
+                                     label += ': ';
+                                 }
+                                 if (context.parsed.y !== null) {
+                                     label += context.parsed.y.toFixed(4); // Show more precision in tooltip
+                                 }
+                                 return label;
+                             }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                         labels: {
+                             // Filter out marker datasets from the legend
+                             filter: function(legendItem, chartData) {
+                                 return !legendItem.text.includes('(θ) value') && !legendItem.text.includes('มุม (Angle θ)');
+                             }
+                         }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'มุม θ (Angle θ in Radians)'
+                        },
+                        min: -2 * Math.PI,
+                        max: 2 * Math.PI,
+                        ticks: {
+                            stepSize: Math.PI / 2, // Tick marks at intervals of pi/2
+                            callback: function(value, index, values) {
+                                // Custom labels for key points
+                                if (value === -2 * Math.PI) return '-2π';
+                                if (value === -3 * Math.PI / 2) return '-3π/2';
+                                if (value === -Math.PI) return '-π';
+                                if (value === -Math.PI / 2) return '-π/2';
+                                if (value === 0) return '0';
+                                if (value === Math.PI / 2) return 'π/2';
+                                if (value === Math.PI) return 'π';
+                                if (value === 3 * Math.PI / 2) return '3π/2';
+                                if (value === 2 * Math.PI) return '2π';
+                                // Otherwise, show number with 2 decimal places
+                                return value.toFixed(2);
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'ค่าฟังก์ชัน (Function Value)'
+                        },
+                        min: -2, // Adjusted range for better tan visibility
+                        max: 2,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return value.toFixed(2); // Format to 2 decimal places
+                            }
+                        }
+                    }
+                },
+                 interaction: {
+                    mode: 'index', // Ensures vertical line hover effect
+                    intersect: false
+                }
+            }
+        });
+
+        // Update chart when slider changes
+        angleSlider.addEventListener('input', (event) => {
+            currentAngle = parseFloat(event.target.value);
+            angleValueSpan.textContent = currentAngle.toFixed(2);
+            displayAngleSin.textContent = currentAngle.toFixed(2);
+            displayAngleCos.textContent = currentAngle.toFixed(2);
+            displayAngleTan.textContent = currentAngle.toFixed(2);
+
+            // Calculate current values
+            const sinVal = Math.sin(currentAngle);
+            const cosVal = Math.cos(currentAngle);
+            let tanVal = NaN; // Default to NaN if at asymptote
+
+            if (Math.abs(Math.cos(currentAngle)) >= 0.001) { // Avoid division by zero
+                 tanVal = Math.tan(currentAngle);
+            }
+
+            // Display values
+            sinValueSpan.textContent = sinVal.toFixed(2);
+            cosValueSpan.textContent = cosVal.toFixed(2);
+            tanValueSpan.textContent = isNaN(tanVal) ? 'ไม่นิยาม (Undefined)' : tanVal.toFixed(2); // Handle undefined tan
+
+            // Update marker positions
+            markers = createMarkerData(currentAngle);
+            trigChart.data.datasets[3].data = [{x: currentAngle, y: -10}, {x: currentAngle, y: 10}]; // Update vertical line
+            trigChart.data.datasets[4].data = [markers.sinMarker];
+            trigChart.data.datasets[5].data = [markers.cosMarker];
+            trigChart.data.datasets[6].data = markers.tanMarker ? [markers.tanMarker] : []; // Update tan marker
+
+
+            trigChart.update('none'); // Update chart without animation
+        });
+
+        // Initial update display
+         angleSlider.dispatchEvent(new Event('input'));
+
+    </script>
+
+</body>
+</html>
