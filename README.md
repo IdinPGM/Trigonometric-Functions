@@ -2,9 +2,7 @@
 
 This is a simple, interactive web application built with HTML, CSS, and JavaScript (using Chart.js) to help visualize the trigonometric functions: Sine, Cosine, and Tangent. It allows users to adjust the angle (θ) and see the corresponding changes on the graph and the calculated values.
 
-📊 **View the live demo here:** [https://YOUR_USERNAME.github.io/YOUR_REPOSITORY_NAME/](https://YOUR_USERNAME.github.io/YOUR_REPOSITORY_NAME/)
-
-*(Remember to replace `YOUR_USERNAME` and `YOUR_REPOSITORY_NAME` with your actual GitHub username and repository name after deploying to GitHub Pages!)*
+📊 **View the live demo here:** [https://IdinPGM.github.io/Trigonometric-Functions/](https://IdinPGM.github.io/Trigonometric-Functions/)
 
 ## Features
 
